@@ -47,7 +47,7 @@ jobs:
       if: steps.should_build.outputs.should_build
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       with:
         tag_name: ${{ steps.version_info.outputs.latest_tag }}
         release_name: Release Aseprite ${{ steps.version_info.outputs.latest_tag }}
@@ -63,7 +63,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
        matrix:
-         os: [windows-latest, ubuntu-latest, macOS-latest]
+         os: [windows-latest]
        fail-fast: false    
     steps:
       - name: (Windows) Install dependencies
@@ -127,7 +127,7 @@ jobs:
       - name: Upload release
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         with:
           upload_url: ${{ needs.check-version.outputs.upload_url }}
           asset_path: aseprite/build/bin/Aseprite-${{ needs.check-version.outputs.latest_tag }}-${{ runner.os }}.zip
