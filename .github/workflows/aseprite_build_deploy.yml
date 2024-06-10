@@ -23,7 +23,7 @@ jobs:
     - name: Get latest version info
       id: version_info
       run: |
-        data=$(curl -sL https://api.github.com/repos/aseprite/aseprite/releases/tags/v1.3.4)
+        data=$(curl -sL https://api.github.com/repos/aseprite/aseprite/releases/latest)
         LATEST_TAG=$(echo "${data}" | jq -r '.tag_name')
         DOWNLOAD_URL=$(echo "${data}" | jq -r '.assets[].browser_download_url')
         VERSION_INFO=$(echo "${data}" | jq -r '.body')
@@ -40,6 +40,7 @@ jobs:
         key: cached_version
     - name: Should we start new build?
       id: should_build
+      if: steps.version_check.outputs.cache-hit != 'true'
       run: echo "::set-output name=should_build::true"
     - name: Create Release
       id: create_release
@@ -58,7 +59,7 @@ jobs:
   build-aseprite:
     name: Build Aseprite
     needs: check-version
-    if: ${{ needs.check-version.outputs.upload_url }}
+    if: ${{ needs.check-version.outputs.should_build }}
     runs-on: ${{ matrix.os }}
     strategy:
        matrix:
@@ -83,7 +84,7 @@ jobs:
       - name: Download Skia if not in cache
         if: steps.skia-cache.outputs.cache-hit != 'true'
         run: |
-          curl -o Skia-${{ runner.os }}-Release-X64.zip -L https://github.com/aseprite/skia/releases/download/m102-861e4743af/Skia-${{ runner.os }}-Release-X64.zip
+          curl -o Skia-${{ runner.os }}-Release-X64.zip -L https://github.com/aseprite/skia/releases/download/m124-eadfe707ca/Skia-${{ runner.os }}-Release-X64.zip
           unzip Skia-${{ runner.os }}-Release-X64.zip -d skia
       - name: Download Aseprite release
         run: |
